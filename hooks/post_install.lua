@@ -82,8 +82,7 @@ function PLUGIN:PostInstall(ctx)
     -- Run configure
     print("Configuring PHP with options...")
     local configureCmd = string.format("cd '%s' && %s./configure %s", sdkPath, envPrefix, configureOptions)
-    -- Use bash explicitly to ensure proper environment variable handling
-    status = os.execute("bash -c " .. string.format("%q", configureCmd))
+    status = os.execute(configureCmd)
     if status ~= 0 and status ~= true then
         error("Failed to configure PHP")
     end
@@ -182,7 +181,7 @@ function configure_macos(configureOptions, homebrew_prefix)
                     table.insert(pkg_config_paths, pkg_path .. "/lib/pkgconfig")
                 end
                 if pkg.path_only then
-                    envPrefix = envPrefix .. "PATH=\"" .. pkg_path .. "/bin:$PATH\" "
+                    envPrefix = envPrefix .. "export PATH=\"" .. pkg_path .. "/bin:$PATH\" && "
                 end
             else
                 io.stderr:write("Warning: " .. pkg.name .. " not found at " .. pkg_path .. check_dir .. "\n")
@@ -199,7 +198,7 @@ function configure_macos(configureOptions, homebrew_prefix)
         if existing_pkg ~= "" then
             new_pkg = new_pkg .. ":" .. existing_pkg
         end
-        envPrefix = envPrefix .. "PKG_CONFIG_PATH='" .. new_pkg .. "' "
+        envPrefix = envPrefix .. "export PKG_CONFIG_PATH=\"" .. new_pkg .. "\" && "
     end
 
     -- Optional packages with configure flags
