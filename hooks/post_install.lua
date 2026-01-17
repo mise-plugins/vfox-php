@@ -133,6 +133,7 @@ function configure_macos(configureOptions, homebrew_prefix)
     -- Required packages
     local required_packages = {
         { name = "bison", path_only = true },
+        { name = "re2c", path_only = true },
         { name = "icu4c", pkg_config = true },
         { name = "krb5", pkg_config = true },
         { name = "libedit", pkg_config = true },
@@ -171,7 +172,9 @@ function configure_macos(configureOptions, homebrew_prefix)
         end
 
         if pkg_path ~= nil then
-            local f = io.open(pkg_path .. "/lib", "r")
+            -- Check for /bin for path_only packages, /lib for others
+            local check_dir = pkg.path_only and "/bin" or "/lib"
+            local f = io.open(pkg_path .. check_dir, "r")
             if f ~= nil then
                 f:close()
                 if pkg.pkg_config then
@@ -181,7 +184,7 @@ function configure_macos(configureOptions, homebrew_prefix)
                     envPrefix = envPrefix .. "PATH='" .. pkg_path .. "/bin:$PATH' "
                 end
             else
-                io.stderr:write("Warning: " .. pkg.name .. " not found\n")
+                io.stderr:write("Warning: " .. pkg.name .. " not found at " .. pkg_path .. check_dir .. "\n")
             end
         else
             io.stderr:write("Warning: " .. pkg.name .. " not found\n")
