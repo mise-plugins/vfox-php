@@ -181,7 +181,7 @@ function configure_macos(configureOptions, homebrew_prefix)
                     table.insert(pkg_config_paths, pkg_path .. "/lib/pkgconfig")
                 end
                 if pkg.path_only then
-                    envPrefix = envPrefix .. "PATH='" .. pkg_path .. "/bin:$PATH' "
+                    envPrefix = envPrefix .. "PATH=\"" .. pkg_path .. "/bin:$PATH\" "
                 end
             else
                 io.stderr:write("Warning: " .. pkg.name .. " not found at " .. pkg_path .. check_dir .. "\n")
