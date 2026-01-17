@@ -82,7 +82,8 @@ function PLUGIN:PostInstall(ctx)
     -- Run configure
     print("Configuring PHP with options...")
     local configureCmd = string.format("cd '%s' && %s./configure %s", sdkPath, envPrefix, configureOptions)
-    status = os.execute(configureCmd)
+    -- Use bash explicitly to ensure proper environment variable handling
+    status = os.execute("bash -c " .. string.format("%q", configureCmd))
     if status ~= 0 and status ~= true then
         error("Failed to configure PHP")
     end
