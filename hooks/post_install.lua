@@ -131,6 +131,8 @@ function configure_macos(configureOptions, homebrew_prefix)
     local pkg_config_paths = {}
 
     -- Required packages
+    -- Note: bzip2 doesn't have pkgconfig, freetype/libpng depend on it
+    -- So we don't add freetype/libpng to PKG_CONFIG_PATH, instead rely on path-based detection
     local required_packages = {
         { name = "bison", path_only = true },
         { name = "re2c", path_only = true },
@@ -144,9 +146,6 @@ function configure_macos(configureOptions, homebrew_prefix)
         { name = "oniguruma", pkg_config = true },
         { name = "sqlite", pkg_config = true },
         { name = "curl", pkg_config = true },
-        { name = "bzip2", pkg_config = true },
-        { name = "freetype", pkg_config = true },
-        { name = "libpng", pkg_config = true },
     }
 
     -- Check for versioned icu4c (icu4c@76, icu4c@77, icu4c@78, etc.)
@@ -204,6 +203,15 @@ function configure_macos(configureOptions, homebrew_prefix)
             new_pkg = new_pkg .. ":" .. existing_pkg
         end
         envPrefix = envPrefix .. "export PKG_CONFIG_PATH=\"" .. new_pkg .. "\" && "
+    end
+
+    -- Set FREETYPE2 flags to bypass pkg-config (bzip2 doesn't have .pc file)
+    local freetype_path = homebrew_prefix .. "/opt/freetype"
+    local f = io.open(freetype_path .. "/lib", "r")
+    if f ~= nil then
+        f:close()
+        envPrefix = envPrefix .. "export FREETYPE2_CFLAGS=\"-I" .. freetype_path .. "/include/freetype2\" && "
+        envPrefix = envPrefix .. "export FREETYPE2_LIBS=\"-L" .. freetype_path .. "/lib -lfreetype\" && "
     end
 
     -- Optional packages with configure flags
