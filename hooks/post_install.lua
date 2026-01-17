@@ -144,6 +144,9 @@ function configure_macos(configureOptions, homebrew_prefix)
         { name = "oniguruma", pkg_config = true },
         { name = "sqlite", pkg_config = true },
         { name = "curl", pkg_config = true },
+        { name = "bzip2", pkg_config = true },
+        { name = "freetype", pkg_config = true },
+        { name = "libpng", pkg_config = true },
     }
 
     -- Check for versioned icu4c (icu4c@76, icu4c@77, icu4c@78, etc.)
