@@ -16,8 +16,8 @@ function PLUGIN:Available(ctx)
             url = "https://api.github.com/repos/php/php-src/tags?per_page=" .. per_page .. "&page=" .. page,
             headers = {
                 ["Accept"] = "application/vnd.github.v3+json",
-                ["User-Agent"] = "vfox-php"
-            }
+                ["User-Agent"] = "vfox-php",
+            },
         })
 
         if err ~= nil or resp.status_code ~= 200 then

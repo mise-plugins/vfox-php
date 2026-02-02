@@ -89,7 +89,8 @@ function PLUGIN:PostInstall(ctx)
 
     -- Build PHP
     print("Building PHP (this may take several minutes)...")
-    local makeCmd = string.format("cd '%s' && make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)", sdkPath)
+    local makeCmd =
+        string.format("cd '%s' && make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)", sdkPath)
     status = os.execute(makeCmd)
     if status ~= 0 and status ~= true then
         error("Failed to build PHP")
@@ -185,7 +186,7 @@ function configure_macos(configureOptions, homebrew_prefix)
                     table.insert(pkg_config_paths, pkg_path .. "/lib/pkgconfig")
                 end
                 if pkg.path_only then
-                    envPrefix = envPrefix .. "export PATH=\"" .. pkg_path .. "/bin:$PATH\" && "
+                    envPrefix = envPrefix .. 'export PATH="' .. pkg_path .. '/bin:$PATH" && '
                 end
             else
                 io.stderr:write("Warning: " .. pkg.name .. " not found at " .. pkg_path .. check_dir .. "\n")
@@ -202,7 +203,7 @@ function configure_macos(configureOptions, homebrew_prefix)
         if existing_pkg ~= "" then
             new_pkg = new_pkg .. ":" .. existing_pkg
         end
-        envPrefix = envPrefix .. "export PKG_CONFIG_PATH=\"" .. new_pkg .. "\" && "
+        envPrefix = envPrefix .. 'export PKG_CONFIG_PATH="' .. new_pkg .. '" && '
     end
 
     -- Set FREETYPE2 flags to bypass pkg-config (bzip2 doesn't have .pc file)
@@ -210,8 +211,8 @@ function configure_macos(configureOptions, homebrew_prefix)
     local f = io.open(freetype_path .. "/lib", "r")
     if f ~= nil then
         f:close()
-        envPrefix = envPrefix .. "export FREETYPE2_CFLAGS=\"-I" .. freetype_path .. "/include/freetype2\" && "
-        envPrefix = envPrefix .. "export FREETYPE2_LIBS=\"-L" .. freetype_path .. "/lib -lfreetype\" && "
+        envPrefix = envPrefix .. 'export FREETYPE2_CFLAGS="-I' .. freetype_path .. '/include/freetype2" && '
+        envPrefix = envPrefix .. 'export FREETYPE2_LIBS="-L' .. freetype_path .. '/lib -lfreetype" && '
     end
 
     -- Optional packages with configure flags
@@ -242,7 +243,7 @@ function configure_macos(configureOptions, homebrew_prefix)
 
     -- Add external-gd if we have the dependencies
     local has_gd_deps = true
-    for _, dep in ipairs({"freetype", "jpeg", "libpng"}) do
+    for _, dep in ipairs({ "freetype", "jpeg", "libpng" }) do
         local f = io.open(homebrew_prefix .. "/opt/" .. dep .. "/lib", "r")
         if f ~= nil then
             f:close()
@@ -291,10 +292,8 @@ function install_composer(sdkPath)
     local php_bin = sdkPath .. "/bin/php"
 
     -- Download installer
-    local download_cmd = string.format(
-        "%s -r \"copy('https://getcomposer.org/installer', '%s/composer-setup.php');\"",
-        php_bin, sdkPath
-    )
+    local download_cmd =
+        string.format("%s -r \"copy('https://getcomposer.org/installer', '%s/composer-setup.php');\"", php_bin, sdkPath)
     local status = os.execute(download_cmd)
     if status ~= 0 and status ~= true then
         io.stderr:write("Warning: Failed to download Composer installer\n")
@@ -304,7 +303,9 @@ function install_composer(sdkPath)
     -- Verify and install
     local install_cmd = string.format(
         "%s '%s/composer-setup.php' --install-dir='%s/bin' --filename=composer",
-        php_bin, sdkPath, sdkPath
+        php_bin,
+        sdkPath,
+        sdkPath
     )
     status = os.execute(install_cmd)
     if status ~= 0 and status ~= true then
